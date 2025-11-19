@@ -2,10 +2,15 @@ import express from "express";
 import dotenv from "dotenv";
 import db from "./config/dbconnection.js";
 import testrouter from "./routes/testroutes.js";
+
 dotenv.config();
 
 
 const app=express();
+// TO PARSE JSON REQUEST BODIES
+app.use(express.json());
+
+
 
 const port=process.env.port;
 
