@@ -1,14 +1,25 @@
 import express from "express";
 import dotenv from "dotenv";
 import db from "./config/dbconnection.js";
+<<<<<<< HEAD
 import authrouter from "./routes/authroutes.js";
 
+=======
+import testrouter from "./routes/testroutes.js";
+>>>>>>> fd06f1cb65709f1c8d41271a32917cb3d21906fd
 
 dotenv.config();
 
 
 const app=express();
+<<<<<<< HEAD
 app.use(express.json());
+=======
+// TO PARSE JSON REQUEST BODIES
+app.use(express.json());
+
+
+>>>>>>> fd06f1cb65709f1c8d41271a32917cb3d21906fd
 
 const port=process.env.port;
 
