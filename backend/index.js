@@ -7,6 +7,7 @@ import authrouter from "./routes/authroutes.js";
 import teacherRouter from "./routes/teacher.routes.js";
 import vacancyrouter from "./routes/vacancy.routes.js";
 import { globalErrorHandler } from "./middlewares/globalErrotHandler.js";
+import cors from "cors";
 
 //=======
 // import testrouter from "./routes/testroutes.js";
@@ -20,6 +21,12 @@ app.use(cookieParser());
 //=======
 // TO PARSE JSON REQUEST BODIES
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 //>>>>>>> fd06f1cb65709f1c8d41271a32917cb3d21906fd
 
