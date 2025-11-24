@@ -8,19 +8,19 @@ const expire = process.env.expireTime;
 // export  const testcontroller =(req,res)=>{
 //     res.send("hello kabi ko budi")
 // }
-export const getAllusers = async (req, res) => {
+export const getAllusers = async (req, res, next) => {
   try {
     const [user] = await db.query("SELECT * FROM users");
     res.status(200).json({
       data: user,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
 // Login Api
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
   //1. get email  and password from user side.
   try {
     const { email, password } = req.body;
@@ -85,7 +85,7 @@ export const login = async (req, res) => {
       //   },
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 //get me Api
@@ -95,13 +95,13 @@ export const login = async (req, res) => {
 //   } catch (error) {}
 // };
 //signout Api
-export const signout = async (req, res) => {
+export const signout = async (req, res, next) => {
   try {
     res.clearCookie("token");
     res.status(200).json({
       message: "succesfully sign out thank you",
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

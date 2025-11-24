@@ -4,6 +4,9 @@ import db from "./config/dbconnection.js";
 import cookieParser from "cookie-parser";
 //<<<<<<< HEAD
 import authrouter from "./routes/authroutes.js";
+import teacherRouter from "./routes/teacher.routes.js";
+import vacancyrouter from "./routes/vacancy.routes.js";
+import { globalErrorHandler } from "./middlewares/globalErrotHandler.js";
 
 //=======
 // import testrouter from "./routes/testroutes.js";
@@ -22,11 +25,14 @@ app.use(express.json());
 
 const port = process.env.port;
 
-app.use("/api/school/", authrouter);
+app.use("/api/auth/", authrouter);
+app.use("/api/teacher/", teacherRouter);
+app.use("/api/vacancy/", vacancyrouter);
+app.use(globalErrorHandler);
 
 try {
   db.connect();
-  console.log("my sql connect succesfull");
+  // console.log("my sql connect succesfull");
 } catch (error) {
   console.error("mysql connection failed", error);
 }

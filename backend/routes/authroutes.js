@@ -7,7 +7,7 @@ authrouter.get("/users", isLogin, getAllusers);
 
 authrouter.post("/login", login);
 
-authrouter.post("/signout", signout);
+authrouter.post("/signout", isLogin, signout);
 export default authrouter;
 
 // authrouter.post("/getMe", getMe);
