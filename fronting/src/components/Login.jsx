@@ -2,9 +2,12 @@ import { useState } from "react";
 import { Input } from "./shared/Input";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/features/authState";
 
 export const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [formData, setformData] = useState({
     email: "",
     password: "",
@@ -34,6 +37,9 @@ export const Login = () => {
       });
       const data = await res.json();
       toast.success(`${data.message}`);
+
+      dispatch(setUser(data?.user.email));
+
       if (res.status === 200) {
         navigate("/dashboard");
       }

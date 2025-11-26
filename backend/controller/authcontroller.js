@@ -43,6 +43,9 @@ export const login = async (req, res, next) => {
     const user = result[0];
     // check the password of found user.
     const ismatch = await bcryptjs.compare(password, user.password);
+    if (!ismatch) {
+      return res.status(401).json({ message: "invalid credentials" });
+    }
     //jwt=jsonwebtoken
     //for genarate token for cookies
     //it takes 3 things
@@ -76,13 +79,13 @@ export const login = async (req, res, next) => {
 
     res.status(200).json({
       message: "login succesfull",
-      //   user: {
-      //     id: user.id,
-      //     name: user.name,
-      //     email: user.email,
-      //     created_at: user.created_at,
-      //     token: token,
-      //   },
+      user: {
+        id: user.id,
+        // name: user.name,
+        email: user.email,
+        //     created_at: user.created_at,
+        //     token: token,
+      },
     });
   } catch (error) {
     next(error);
