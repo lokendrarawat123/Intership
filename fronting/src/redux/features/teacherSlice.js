@@ -11,13 +11,33 @@ export const teacherApi = indexSlice.injectEndpoints({
       providesTags: ["teacher"],
     }),
     addTeacher: builder.mutation({
-      query: () => ({
-        url: "/teacher/add-teacher",
+      query: (data) => ({
+        url: `/teacher/add-teacher/`,
         method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["teacher"],
+    }),
+    deleteTeacher: builder.mutation({
+      query: (id) => ({
+        url: `/teacher/delete-teacher/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["teacher"],
+    }),
+    updateTeacher: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/teacher/update-teacher/${id}`,
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["teacher"],
     }),
   }),
 });
-export const { useGetAllTeacherQuery, useAddTeacherMutation } = teacherApi;
+export const {
+  useGetAllTeacherQuery,
+  useAddTeacherMutation,
+  useDeleteTeacherMutation,
+  useUpdateTeacherMutation,
+} = teacherApi;

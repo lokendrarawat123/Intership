@@ -1,27 +1,79 @@
-import React from "react";
-import { useGetAllTeacherQuery } from "../../../redux/features/teacherSlice";
+import React, { useState } from "react";
+import {
+  useDeleteTeacherMutation,
+  useGetAllTeacherQuery,
+  useUpdateTeacherMutation,
+} from "../../../redux/features/teacherSlice";
 import { Loading } from "../../shared/Loading";
 import { Error } from "../../shared/Error";
 import { toast } from "react-toastify";
 
 export const TeacherDashboard = () => {
+  const [teacherId, setTeacherId] = useState();
+  const [isMoalOpen, setIsModalOpen] = useState(false);
+  // const [selectedTeacher, setSelectedTeacher] = useState(null);
   const { data, isLoading, error } = useGetAllTeacherQuery();
+  const [deleteTeacher] = useDeleteTeacherMutation();
+  const [updateTeacher] = useUpdateTeacherMutation();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    possition: "",
+    phone: "",
+  });
   // console.log(data);
+  const teachers = data?.data;
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleDelete = async (teacher) => {
+    setTeacherId(teacher.id);
+    // console.log(teacher.id);
+    // toast.error("hey");
+    try {
+      await deleteTeacher(teacherId).unwrap(); // for use state
+      //await deleteTeacher(teacher.id).unwrap(); // for  direct api call.
+      toast.success("teacher deleted succesfully");
+    } catch (error) {
+      toast.error("failed to delete teacher");
+    }
+  };
+  // console.log(teacherId);
+
+  const handleEdit = (teacher) => {
+    setIsModalOpen(true);
+    // setSelectedTeacher(teacher);
+    setTeacherId(teacher.id);
+    setFormData({
+      name: teacher.name,
+      email: teacher.email,
+      possition: teacher.possition,
+      phone: teacher.phone,
+    });
+    // toast.error("hey ");
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateTeacher({ id: teacherId, data: formData });
+      toast.success(" update teacher succesfully");
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("failed to update teacher");
+    }
+  };
+
   if (isLoading) {
     return <Loading isLoading={isLoading} />;
   }
   if (error) {
     return <Error Error={Error} />;
   }
-  const teachers = data?.data;
-  const handleDelete = () => {
-    toast.error("hey");
-  };
-
-  const handleEdit = () => {
-    toast.error("hey ");
-  };
-
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
@@ -71,10 +123,16 @@ export const TeacherDashboard = () => {
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   <div className="space-x-4">
-                    <button onClick={handleDelete} className="cursor-pointer">
+                    <button
+                      onClick={() => handleDelete(teacher)}
+                      className="cursor-pointer"
+                    >
                       Delete
                     </button>
-                    <button onClick={handleEdit} className="cursor-pointer">
+                    <button
+                      onClick={() => handleEdit(teacher)}
+                      className="cursor-pointer"
+                    >
                       Edit
                     </button>
                   </div>
@@ -88,6 +146,63 @@ export const TeacherDashboard = () => {
           <p className="p-4 text-center text-gray-500">No teacher data found</p>
         )}
       </div>
+
+      {isMoalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Edit Teacher</h2>
+            <form onSubmit={handleSubmit}>
+              <input
+                value={formData?.name || ""}
+                type="text"
+                id="name"
+                placeholder="Name"
+                className="w-full p-2 border rounded mb-3"
+                onChange={handleChange}
+              />
+              <input
+                value={formData?.email || ""}
+                type="email"
+                id="email"
+                placeholder="Email"
+                className="w-full p-2 border rounded mb-3"
+                onChange={handleChange}
+              />
+              <input
+                value={formData?.possition || ""}
+                type="text"
+                id="position"
+                placeholder="Position"
+                className="w-full p-2 border rounded mb-3"
+                onChange={handleChange}
+              />
+              <input
+                value={formData?.phone || ""}
+                type="text"
+                id="phone"
+                placeholder="Phone"
+                className="w-full p-2 border rounded mb-3"
+                onChange={handleChange}
+              />
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  type="button"
+                  className=" cursor-pointer px-4 py-2 bg-gray-300 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className=" cursor-pointer px-4 py-2 bg-blue-600 text-white rounded"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -23,7 +23,7 @@ export const Dashboard = () => {
             to="/dashboard/teacher"
             className="text-white text-xl p-3 bg-amber-400 m-1 rounded-md"
           >
-            Add Teacher
+            Teacher
           </Link>
         </div>
         <div className="flex flex-col justify-center items-center mx-auto">

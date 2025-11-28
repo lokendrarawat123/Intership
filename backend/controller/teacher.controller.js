@@ -110,7 +110,7 @@ export const updateTeacher = async (req, res, next) => {
       });
     }
     const oldTeacher = teacher[0];
-    // console.log(teacher[0]);
+    console.log(teacher[0]);
 
     // if teacher exist update the teacher details
     await db.execute(
@@ -119,7 +119,7 @@ export const updateTeacher = async (req, res, next) => {
         name ?? oldTeacher.name,
         email ?? oldTeacher.email,
         phone ?? oldTeacher.phone,
-        position ?? oldTeacher.position,
+        position ?? oldTeacher.possition,
         id,
       ]
     );
