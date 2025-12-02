@@ -5,12 +5,12 @@ export const addVacancy = async (req, res, next) => {
     const { position, discription, deadline } = req.body;
     console.log(req.body);
     if (!position || !discription || !deadline) {
-      return res.status(400).json({
+      return res.status(400).jsoyata({
         message: "all fields are requried ",
       });
     }
     await db.execute(
-      "insert into vacancy (possition,discription,deadline) values(?,?,?)",
+      "insert into vacancy (position,discription,deadline) values(?,?,?)",
       [position, discription, deadline]
     );
     res.status(200).json({
@@ -40,7 +40,7 @@ export const deleteVacancy = async (req, res, next) => {
     console.log(req.params);
 
     const [existingId] = await db.execute(
-      "select id,  possition from vacancy where id=?",
+      "select id,  position from vacancy where id=?",
       [id]
     );
     const data = existingId[0];
@@ -53,7 +53,7 @@ export const deleteVacancy = async (req, res, next) => {
     }
     await db.execute("delete from vacancy where id=? ", [id]);
     res.status(200).json({
-      message: `delete succesfully  vacancy of this ${data.possition}  `,
+      message: `delete succesfully  vacancy of this ${data.position}  `,
     });
   } catch (error) {
     next(error);

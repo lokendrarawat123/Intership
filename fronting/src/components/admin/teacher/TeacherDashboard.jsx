@@ -9,16 +9,16 @@ import { Error } from "../../shared/Error";
 import { toast } from "react-toastify";
 
 export const TeacherDashboard = () => {
-  const [teacherId, setTeacherId] = useState();
-  const [isMoalOpen, setIsModalOpen] = useState(false);
-  // const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const { data, isLoading, error } = useGetAllTeacherQuery();
-  const [deleteTeacher] = useDeleteTeacherMutation();
-  const [updateTeacher] = useUpdateTeacherMutation();
+  const [teacherId, setTeacherId] = useState(); // for get teacher id
+  const [isMoalOpen, setIsModalOpen] = useState(false); // for edit form open or close
+  const [selectedTeacher, setSelectedTeacher] = useState({}); // for new input value in edit form
+  const { data, isLoading, error } = useGetAllTeacherQuery(); // for get teacher api
+  const [deleteTeacher] = useDeleteTeacherMutation(); // for delete teacher api
+  const [updateTeacher] = useUpdateTeacherMutation(); // for update teacher api
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    possition: "",
+    position: "",
     phone: "",
   });
   // console.log(data);
@@ -36,8 +36,8 @@ export const TeacherDashboard = () => {
     // console.log(teacher.id);
     // toast.error("hey");
     try {
-      await deleteTeacher(teacherId).unwrap(); // for use state
-      //await deleteTeacher(teacher.id).unwrap(); // for  direct api call.
+      // await deleteTeacher(teacherId).unwrap(); // for use state
+      await deleteTeacher(teacher.id).unwrap(); // for  direct api call.
       toast.success("teacher deleted succesfully");
     } catch (error) {
       toast.error("failed to delete teacher");
@@ -49,22 +49,38 @@ export const TeacherDashboard = () => {
     setIsModalOpen(true);
     // setSelectedTeacher(teacher);
     setTeacherId(teacher.id);
+    setSelectedTeacher(teacher);
     setFormData({
       name: teacher.name,
       email: teacher.email,
-      possition: teacher.possition,
+      position: teacher.position,
       phone: teacher.phone,
     });
     // toast.error("hey ");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const changedFields = {};
+
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== selectedTeacher[key]) {
+        changedFields[key] = formData[key];
+      }
+    });
+    if (Object.keys(changedFields).length === 0) {
+      toast.info("no change detect");
+      return;
+    }
     try {
-      await updateTeacher({ id: teacherId, data: formData });
-      toast.success(" update teacher succesfully");
+      const res = await updateTeacher({
+        id: teacherId,
+        data: changedFields,
+      }).unwrap();
+      console.log(res);
+      toast.success(res.message || " update teacher succesfully");
       setIsModalOpen(false);
     } catch (error) {
-      toast.error("failed to update teacher");
+      toast.error(error?.data?.message || "failed to update teacher");
     }
   };
 
@@ -92,7 +108,7 @@ export const TeacherDashboard = () => {
                 Email
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Possition
+                Position
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                 Phone
@@ -116,7 +132,7 @@ export const TeacherDashboard = () => {
                   {teacher.email}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {teacher.possition}
+                  {teacher.position}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {teacher.phone}
@@ -169,7 +185,7 @@ export const TeacherDashboard = () => {
                 onChange={handleChange}
               />
               <input
-                value={formData?.possition || ""}
+                value={formData?.position || ""}
                 type="text"
                 id="position"
                 placeholder="Position"

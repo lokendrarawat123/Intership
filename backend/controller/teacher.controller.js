@@ -34,7 +34,7 @@ export const addTeacher = async (req, res, next) => {
       });
     }
     await db.execute(
-      "insert into teacher(name,email,possition,phone) values(?,?,?,?)",
+      "insert into teacher(name,email,position,phone) values(?,?,?,?)",
       [name, email, position, phone]
     );
     return res.status(201).json({
@@ -84,47 +84,57 @@ export const deleteTeacher = async (req, res, next) => {
 export const updateTeacher = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // console.log(id);
-    // console.log(req.body);
-    const { name, email, position, phone } = req.body;
-    // console.log(req.body);
-    //1. check if teacher exist
-    const [teacher] = await db.execute("select * from teacher where id = ?", [
+    const changeData = req.body.data;
+
+    // 1️⃣ check if teacher exist
+    const [teacher] = await db.execute("SELECT * FROM teacher WHERE id = ?", [
       id,
     ]);
-    // console.log(teacher);
     if (teacher.length === 0) {
-      return res.status(404).json({
-        message: "teacher not found",
-      });
+      return res.status(404).json({ message: "Teacher not found" });
     }
-    //check existing email
-    const [existingEmail] = await db.execute(
-      "select email from teacher where email = ?",
-      [email]
-    );
 
-    if (existingEmail.length > 0) {
-      return res.status(404).json({
-        message: "email is already exist, use another email",
-      });
-    }
     const oldTeacher = teacher[0];
-    console.log(teacher[0]);
 
-    // if teacher exist update the teacher details
-    await db.execute(
-      "update teacher set name=?,email=?,phone=?,possition=? where id=?",
-      [
-        name ?? oldTeacher.name,
-        email ?? oldTeacher.email,
-        phone ?? oldTeacher.phone,
-        position ?? oldTeacher.possition,
-        id,
-      ]
-    );
-    res.status(200).json({ message: `this ${id} is succesfully updated` });
-    console.log(oldTeacher);
+    // 2️⃣ Check email duplication if email is changed
+    if (changeData.email && changeData.email !== oldTeacher.email) {
+      const [existingEmail] = await db.execute(
+        "SELECT id FROM teacher WHERE email = ?",
+        [changeData.email]
+      );
+      if (existingEmail.length > 0) {
+        return res
+          .status(409)
+          .json({ message: "Email already exists, use another email" });
+      }
+    }
+
+    // 3️⃣ Prepare dynamic fields for update
+    const fields = [];
+    const values = [];
+
+    Object.keys(changeData).forEach((key) => {
+      if (
+        changeData[key] !== undefined &&
+        changeData[key] !== oldTeacher[key]
+      ) {
+        fields.push(`${key} = ?`);
+        values.push(changeData[key]);
+      }
+    });
+
+    if (fields.length === 0) {
+      // return res.status(400).json({ message: "No fields to update" });
+    }
+
+    values.push(id); // Add id as last parameter for WHERE clause
+
+    const sql = `UPDATE teacher SET ${fields.join(", ")} WHERE id = ?`;
+
+    // 4️⃣ Execute update
+    await db.execute(sql, values);
+
+    res.status(200).json({ message: `Teacher ${id} updated successfully` });
   } catch (error) {
     next(error);
   }

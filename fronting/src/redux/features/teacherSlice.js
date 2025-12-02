@@ -26,7 +26,7 @@ export const teacherApi = indexSlice.injectEndpoints({
       invalidatesTags: ["teacher"],
     }),
     updateTeacher: builder.mutation({
-      query: ({ id, data }) => ({
+      query: ({ id, ...data }) => ({
         url: `/teacher/update-teacher/${id}`,
         method: "PATCH",
         body: data,
