@@ -7,7 +7,7 @@ export const addTeacher = async (req, res, next) => {
     // console.log(name, email, phone, position);
     if (!name || !email || !phone || !position) {
       return res.status(400).json({
-        messege: "all fields are required.",
+        message: "all fields are required.",
       });
     }
     //check first email
@@ -19,7 +19,7 @@ export const addTeacher = async (req, res, next) => {
     //return message
     if (existingEmail.length > 0) {
       res.status(409).json({
-        messege: "email is already registerd",
+        message: "email is already registerd",
       });
     }
     //check first phone number
@@ -30,7 +30,7 @@ export const addTeacher = async (req, res, next) => {
     //return message
     if (existingNumber.length > 0) {
       res.status(409).json({
-        messege: "phone number  is already registerd",
+        message: "phone number  is already registerd",
       });
     }
     await db.execute(
@@ -38,7 +38,7 @@ export const addTeacher = async (req, res, next) => {
       [name, email, position, phone]
     );
     return res.status(201).json({
-      messege: "teacher inserted succesfully",
+      message: "teacher inserted succesfully",
     });
   } catch (error) {
     next(error);

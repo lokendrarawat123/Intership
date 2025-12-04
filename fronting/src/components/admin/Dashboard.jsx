@@ -2,19 +2,30 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../redux/features/authState";
 import { Link, useNavigate } from "react-router-dom";
+import { useSignOutMutation } from "../../redux/features/authSlice";
+import { toast } from "react-toastify";
 
 export const Dashboard = () => {
   const { email, isAuth } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const [signout] = useSignOutMutation();
   useEffect(() => {
     if (!isAuth) {
       navigate("/not-found");
     }
-  }, [isAuth]);
+  }, []);
+  const handleLogout = async () => {
+    try {
+      const res = await signout().unwrap();
+      toast.success(res.message || "logout");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.data?.message || "logout failed");
+    }
+    dispatch(logout());
+  };
+
   return (
     <>
       <div className="h-screen flex">

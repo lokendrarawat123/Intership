@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  useAddTeacherMutation,
   useDeleteTeacherMutation,
   useGetAllTeacherQuery,
   useUpdateTeacherMutation,
@@ -7,20 +8,24 @@ import {
 import { Loading } from "../../shared/Loading";
 import { Error } from "../../shared/Error";
 import { toast } from "react-toastify";
+const intialData = {
+  name: "",
+  email: "",
+  position: "",
+  phone: "",
+};
 
 export const TeacherDashboard = () => {
+  const { data, isLoading, error } = useGetAllTeacherQuery(); // for get teacher api
+  const [deleteTeacher] = useDeleteTeacherMutation(); // for delete teacher api
+  const [updateTeacher] = useUpdateTeacherMutation();
+  const [addTeacher] = useAddTeacherMutation();
   const [teacherId, setTeacherId] = useState(); // for get teacher id
   const [isMoalOpen, setIsModalOpen] = useState(false); // for edit form open or close
   const [selectedTeacher, setSelectedTeacher] = useState({}); // for new input value in edit form
-  const { data, isLoading, error } = useGetAllTeacherQuery(); // for get teacher api
-  const [deleteTeacher] = useDeleteTeacherMutation(); // for delete teacher api
-  const [updateTeacher] = useUpdateTeacherMutation(); // for update teacher api
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    position: "",
-    phone: "",
-  });
+
+  const [isAdding, setIsAdding] = useState(false); // for update teacher api
+  const [formData, setFormData] = useState(intialData);
   // console.log(data);
   const teachers = data?.data;
   const handleChange = (e) => {
@@ -47,6 +52,7 @@ export const TeacherDashboard = () => {
 
   const handleEdit = (teacher) => {
     setIsModalOpen(true);
+    setIsAdding(false);
     // setSelectedTeacher(teacher);
     setTeacherId(teacher.id);
     setSelectedTeacher(teacher);
@@ -60,6 +66,17 @@ export const TeacherDashboard = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isAdding) {
+      try {
+        const res = await addTeacher(formData).unwrap();
+        toast.success(res.message || "teacher added succesfully!!!");
+        setFormData(intialData);
+        setIsModalOpen(false);
+      } catch (error) {
+        toast.error(error.data?.message || "failed to add");
+      }
+      return;
+    }
     const changedFields = {};
 
     Object.keys(formData).forEach((key) => {
@@ -83,6 +100,13 @@ export const TeacherDashboard = () => {
       toast.error(error?.data?.message || "failed to update teacher");
     }
   };
+  const handleAdd = () => {
+    setIsModalOpen(true);
+    setIsAdding(true);
+    setTeacherId(null);
+    setSelectedTeacher({});
+    setFormData(intialData);
+  };
 
   if (isLoading) {
     return <Loading isLoading={isLoading} />;
@@ -92,7 +116,15 @@ export const TeacherDashboard = () => {
   }
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
+      <div className="flex justify-between mb-6">
+        <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
+        <button
+          onClick={handleAdd}
+          className="cursor-pointer bg-green-400 text-white px-3 rounded-full"
+        >
+          Add New Teacher
+        </button>
+      </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         <table className="min-w-full divide-y divide-gray-200">
@@ -166,7 +198,9 @@ export const TeacherDashboard = () => {
       {isMoalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Edit Teacher</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {isAdding ? "Add" : "Edit"} Teacher
+            </h2>
             <form onSubmit={handleSubmit}>
               <input
                 value={formData?.name || ""}
@@ -212,7 +246,7 @@ export const TeacherDashboard = () => {
                   type="submit"
                   className=" cursor-pointer px-4 py-2 bg-blue-600 text-white rounded"
                 >
-                  Update
+                  {isAdding ? "Add Teacher" : "Update"}
                 </button>
               </div>
             </form>

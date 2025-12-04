@@ -4,10 +4,12 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/features/authState";
+import { useSignInMutation } from "../redux/features/authSlice";
 
 export const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [Login] = useSignInMutation();
   const [formData, setformData] = useState({
     email: "",
     password: "",
@@ -27,24 +29,13 @@ export const Login = () => {
     }
     // console.log(formData);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      toast.success(`${data.message}`);
+      const res = await Login(formData).unwrap(); //calling login api throuh redux
+      toast.success(res.message || "logged in");
 
-      dispatch(setUser(data?.user.email));
-
-      if (res.status === 200) {
-        navigate("/dashboard");
-      }
+      dispatch(setUser(res?.user.email));
+      navigate("/dashboard");
     } catch (error) {
-      toast.error("something went wrong ");
+      toast.error(error.data?.message || "something went wrong ");
     }
   };
 
