@@ -6,8 +6,9 @@ import {
   updateTeacher,
 } from "../controller/teacher.controller.js";
 import { isLogin } from "../middlewares/isLogin.js";
+import { upload } from "../utils/multer.js";
 const teacherRouter = express.Router();
-teacherRouter.post("/add-teacher", isLogin, addTeacher);
+teacherRouter.post("/add-teacher", isLogin, upload.single("image"), addTeacher);
 teacherRouter.get("/get-teacher", isLogin, getTeacher);
 teacherRouter.delete("/delete-teacher/:id", isLogin, deleteTeacher);
 teacherRouter.patch("/update-teacher/:id", isLogin, updateTeacher);

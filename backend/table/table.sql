@@ -11,6 +11,7 @@ create table Teacher(
     email varchar(255) not null UNIQUE,
     possition varchar (255) not null,
     phone  varchar (255) not null UNIQUE,
+    img varchar(255) null,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
 create table vacancy(

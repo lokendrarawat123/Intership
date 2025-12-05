@@ -88,6 +88,7 @@ export const login = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("Login error:", error);
     next(error);
   }
 };

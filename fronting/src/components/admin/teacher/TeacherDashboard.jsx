@@ -131,7 +131,7 @@ export const TeacherDashboard = () => {
           <thead className="bg-gray-100">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                ID
+                Photo
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                 Name
@@ -145,6 +145,7 @@ export const TeacherDashboard = () => {
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                 Phone
               </th>
+
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
                 Action
               </th>
@@ -155,7 +156,11 @@ export const TeacherDashboard = () => {
             {teachers.map((teacher) => (
               <tr key={teacher.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-800">
-                  {teacher.id}
+                  <img
+                    src={`${import.meta.env.VITE_IMG_URL}/${teacher.img}`}
+                    alt={teacher.img ? teacher.name : "No Image"}
+                    className="w-12 h-12 object-cover"
+                  />
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {teacher.name}
@@ -169,6 +174,7 @@ export const TeacherDashboard = () => {
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {teacher.phone}
                 </td>
+
                 <td className="px-6 py-4 text-sm text-gray-700">
                   <div className="space-x-4">
                     <button
@@ -234,6 +240,7 @@ export const TeacherDashboard = () => {
                 className="w-full p-2 border rounded mb-3"
                 onChange={handleChange}
               />
+
               <div className="flex justify-end space-x-2">
                 <button
                   onClick={() => setIsModalOpen(false)}

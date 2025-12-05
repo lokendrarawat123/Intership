@@ -1,15 +1,22 @@
 import db from "../config/dbconnection.js";
+import { removeImg } from "../utils/removeImg.js";
 
 // add teacher Api
 export const addTeacher = async (req, res, next) => {
+  // return res.json({ file: req.file }); for image
   try {
     const { name, email, phone, position } = req.body;
+
     // console.log(name, email, phone, position);
     if (!name || !email || !phone || !position) {
-      return res.status(400).json({
+      if (req.file) {
+        removeImg(req.file.path);
+      }
+      res.status(400).json({
         message: "all fields are required.",
       });
     }
+
     //check first email
     const [existingEmail] = await db.execute(
       "select id from teacher where email=?",
@@ -18,6 +25,9 @@ export const addTeacher = async (req, res, next) => {
 
     //return message
     if (existingEmail.length > 0) {
+      if (req.file) {
+        removeImg(req.file.path);
+      }
       res.status(409).json({
         message: "email is already registerd",
       });
@@ -29,13 +39,17 @@ export const addTeacher = async (req, res, next) => {
     );
     //return message
     if (existingNumber.length > 0) {
+      if (req.file) {
+        removeImg(req.file.path);
+      }
       res.status(409).json({
         message: "phone number  is already registerd",
       });
     }
+    const imagePath = req.file ? `uploads/teachers/${req.file.filename}` : null;
     await db.execute(
-      "insert into teacher(name,email,position,phone) values(?,?,?,?)",
-      [name, email, position, phone]
+      "insert into teacher(name,email,position,phone,img) values(?,?,?,?,?)",
+      [name, email, position, phone, imagePath]
     );
     return res.status(201).json({
       message: "teacher inserted succesfully",

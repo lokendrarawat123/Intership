@@ -15,6 +15,7 @@ export const Dashboard = () => {
       navigate("/not-found");
     }
   }, []);
+
   const handleLogout = async () => {
     try {
       const res = await signout().unwrap();
