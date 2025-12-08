@@ -13,6 +13,7 @@ const intialData = {
   email: "",
   position: "",
   phone: "",
+  image: "",
 };
 
 export const TeacherDashboard = () => {
@@ -35,6 +36,11 @@ export const TeacherDashboard = () => {
       [id]: value,
     }));
   };
+  const handleFileChange = (e) =>
+    setFormData((prev) => ({
+      ...prev,
+      image: e.target.files[0],
+    }));
 
   const handleDelete = async (teacher) => {
     setTeacherId(teacher.id);
@@ -61,14 +67,22 @@ export const TeacherDashboard = () => {
       email: teacher.email,
       position: teacher.position,
       phone: teacher.phone,
+      image: teacher.image,
     });
     // toast.error("hey ");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isAdding) {
+      const multerData = new FormData();
+      multerData.append("name", formData.name);
+      multerData.append("email", formData.email);
+      multerData.append("position", formData.position);
+      multerData.append("phone", formData.phone);
+      multerData.append("image", formData.image);
+
       try {
-        const res = await addTeacher(formData).unwrap();
+        const res = await addTeacher(multerData).unwrap();
         toast.success(res.message || "teacher added succesfully!!!");
         setFormData(intialData);
         setIsModalOpen(false);
@@ -77,27 +91,40 @@ export const TeacherDashboard = () => {
       }
       return;
     }
-    const changedFields = {};
 
-    Object.keys(formData).forEach((key) => {
+    const changes = {};
+    for (const key in formData) {
       if (formData[key] !== selectedTeacher[key]) {
-        changedFields[key] = formData[key];
+        changes[key] = formData[key];
       }
-    });
-    if (Object.keys(changedFields).length === 0) {
-      toast.info("no change detect");
+    }
+
+    // If no changes
+    if (changes.length === 0) {
+      toast.info("No changes to update");
       return;
     }
+
+    // If image updated, create FormData()
+    let sendData = changes;
+    if (changes.image) {
+      const updateData = new FormData();
+      Object.keys(changes).forEach((key) => {
+        updateData.append(key, changes[key]);
+      });
+      sendData = updateData; // send as multipart
+    }
+
     try {
       const res = await updateTeacher({
         id: teacherId,
-        data: changedFields,
+        data: sendData,
       }).unwrap();
-      console.log(res);
-      toast.success(res.message || " update teacher succesfully");
+
+      toast.success(res.message || "Teacher updated successfully");
       setIsModalOpen(false);
     } catch (error) {
-      toast.error(error?.data?.message || "failed to update teacher");
+      toast.error(error?.data?.message || "Failed to update teacher");
     }
   };
   const handleAdd = () => {
@@ -202,7 +229,7 @@ export const TeacherDashboard = () => {
       </div>
 
       {isMoalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-opacity-50 flex justify-center items-center bg-black/40">
           <div className="bg-white p-6 rounded-lg w-96">
             <h2 className="text-xl font-bold mb-4">
               {isAdding ? "Add" : "Edit"} Teacher
@@ -239,6 +266,24 @@ export const TeacherDashboard = () => {
                 placeholder="Phone"
                 className="w-full p-2 border rounded mb-3"
                 onChange={handleChange}
+              />
+              {
+                !isAdding && formData.image ? (
+                  <img
+                    src={`${import.meta.env.VITE_IMG_URL}/${formData.image}`}
+                    alt={formData.name || "Teacher Image"}
+                    className="w-24 h-24 rounded-full object-cover mb-3"
+                  />
+                ) : null
+                // <div className="mb-3 text-gray-500">No image selected</div>
+              }
+
+              <input
+                type="file"
+                id="image"
+                onChange={handleFileChange}
+                required={isAdding}
+                className="mb-4 border rounded p-2 w-full cursor-pointer"
               />
 
               <div className="flex justify-end space-x-2">

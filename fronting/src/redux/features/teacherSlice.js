@@ -1,8 +1,8 @@
 import { indexSlice } from "./indexSlice";
+
 export const teacherApi = indexSlice.injectEndpoints({
   endpoints: (builder) => ({
-    //Get all teacher   // for query =get data amd moutation =post delete update
-
+    // GET all teacher
     getAllTeacher: builder.query({
       query: () => ({
         url: "/teacher/get-teacher",
@@ -10,14 +10,18 @@ export const teacherApi = indexSlice.injectEndpoints({
       }),
       providesTags: ["teacher"],
     }),
+
+    // ADD teacher
     addTeacher: builder.mutation({
       query: (data) => ({
-        url: `/teacher/add-teacher/`,
+        url: `/teacher/add-teacher`,
         method: "POST",
-        body: data,
+        body: data, // FormData
       }),
       invalidatesTags: ["teacher"],
     }),
+
+    // DELETE teacher
     deleteTeacher: builder.mutation({
       query: (id) => ({
         url: `/teacher/delete-teacher/${id}`,
@@ -25,16 +29,19 @@ export const teacherApi = indexSlice.injectEndpoints({
       }),
       invalidatesTags: ["teacher"],
     }),
+
+    // UPDATE teacher (fixed)
     updateTeacher: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, data }) => ({
         url: `/teacher/update-teacher/${id}`,
         method: "PATCH",
-        body: data,
+        body: data, // FormData or simple object
       }),
       invalidatesTags: ["teacher"],
     }),
   }),
 });
+
 export const {
   useGetAllTeacherQuery,
   useAddTeacherMutation,

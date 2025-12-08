@@ -11,6 +11,11 @@ const teacherRouter = express.Router();
 teacherRouter.post("/add-teacher", isLogin, upload.single("image"), addTeacher);
 teacherRouter.get("/get-teacher", isLogin, getTeacher);
 teacherRouter.delete("/delete-teacher/:id", isLogin, deleteTeacher);
-teacherRouter.patch("/update-teacher/:id", isLogin, updateTeacher);
+teacherRouter.patch(
+  "/update-teacher/:id",
+  isLogin,
+  upload.single("image"),
+  updateTeacher
+);
 
 export default teacherRouter;
