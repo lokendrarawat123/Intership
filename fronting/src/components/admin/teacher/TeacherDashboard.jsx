@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import {
   useAddTeacherMutation,
   useDeleteTeacherMutation,
@@ -9,6 +9,7 @@ import { Loading } from "../../shared/Loading";
 import { Error } from "../../shared/Error";
 import { toast } from "react-toastify";
 import { Pagignation } from "../../shared/Pagignation";
+import { useSelector } from "react-redux";
 const intialData = {
   name: "",
   email: "",
@@ -24,6 +25,7 @@ export const TeacherDashboard = () => {
     page,
     limit: 5,
   }); // for get teacher api
+  const { role } = useSelector((state) => state.user);
   const [deleteTeacher] = useDeleteTeacherMutation(); // for delete teacher api
   const [updateTeacher] = useUpdateTeacherMutation();
   const [addTeacher] = useAddTeacherMutation();
@@ -154,12 +156,14 @@ export const TeacherDashboard = () => {
     <div className="p-6">
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold mb-4">Teachers List</h1>
-        <button
-          onClick={handleAdd}
-          className="cursor-pointer bg-green-400 text-white px-3 rounded-full"
-        >
-          Add New Teacher
-        </button>
+        {role == "admin" && (
+          <button
+            onClick={handleAdd}
+            className="cursor-pointer bg-green-400 text-white px-3 rounded-full"
+          >
+            Add New Teacher
+          </button>
+        )}
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -182,9 +186,11 @@ export const TeacherDashboard = () => {
                 Phone
               </th>
 
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                Action
-              </th>
+              {role == "admin" && (
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                  Action
+                </th>
+              )}
             </tr>
           </thead>
 
@@ -211,22 +217,24 @@ export const TeacherDashboard = () => {
                   {teacher.phone}
                 </td>
 
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  <div className="space-x-4">
-                    <button
-                      onClick={() => handleDelete(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleEdit(teacher)}
-                      className="cursor-pointer"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </td>
+                {role == "admin" && (
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    <div className="space-x-4">
+                      <button
+                        onClick={() => handleDelete(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => handleEdit(teacher)}
+                        className="cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

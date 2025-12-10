@@ -1,15 +1,13 @@
 import db from "../config/dbconnection.js";
 import { removeImg } from "../utils/removeImg.js";
+import { compressImg } from "../utils/sharpHandler.js";
 
 // add teacher Api
 export const addTeacher = async (req, res, next) => {
   // console.log(req.user);
-  const { role } = req.user;
+
   // return res.json({ file: req.file }); for image
   try {
-    if (role !== "admin") {
-      return res.status(403).json({ message: "Acces denied .Admin only" });
-    }
     const { name, email, phone, position } = req.body;
 
     // console.log(name, email, phone, position);
@@ -51,7 +49,13 @@ export const addTeacher = async (req, res, next) => {
         message: "phone number  is already registerd",
       });
     }
-    const imagePath = req.file ? `uploads/teachers/${req.file.filename}` : null;
+
+    let imagePath = "";
+    if (req.file) {
+      const outputPath = `uploads/teachers/school-${req.file.filename}`;
+      await compressImg(req.file.path, outputPath);
+      imagePath = outputPath;
+    }
     await db.execute(
       "insert into teacher(name,email,position,phone,img) values(?,?,?,?,?)",
       [name, email, position, phone, imagePath]
