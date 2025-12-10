@@ -3,8 +3,13 @@ import { removeImg } from "../utils/removeImg.js";
 
 // add teacher Api
 export const addTeacher = async (req, res, next) => {
+  // console.log(req.user);
+  const { role } = req.user;
   // return res.json({ file: req.file }); for image
   try {
+    if (role !== "admin") {
+      return res.status(403).json({ message: "Acces denied .Admin only" });
+    }
     const { name, email, phone, position } = req.body;
 
     // console.log(name, email, phone, position);
@@ -61,7 +66,7 @@ export const addTeacher = async (req, res, next) => {
 // get teacher Api for display all teachers
 export const getTeacher = async (req, res, next) => {
   try {
-    let { page = 1, limit = 2 } = req.query; //pagignation
+    let { page = 1, limit = 10 } = req.query; //pagignation
     // console.log((page = 1), (limit = 10));
     page = Number(page); //convet into integer or number
     limit = Number(limit);
@@ -82,7 +87,7 @@ export const getTeacher = async (req, res, next) => {
       limit,
       offset,
       total,
-      totalPage: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / limit),
       remainig: total - (offset + limit),
     });
   } catch (error) {

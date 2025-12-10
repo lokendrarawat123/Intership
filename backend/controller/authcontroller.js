@@ -56,6 +56,7 @@ export const login = async (req, res, next) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
       //secrete key
       dot,
@@ -83,6 +84,7 @@ export const login = async (req, res, next) => {
         id: user.id,
         // name: user.name,
         email: user.email,
+        role: user.role,
         //     created_at: user.created_at,
         //     token: token,
       },

@@ -32,7 +32,8 @@ export const Login = () => {
       const res = await Login(formData).unwrap(); //calling login api throuh redux
       toast.success(res.message || "logged in");
 
-      dispatch(setUser(res?.user.email));
+      dispatch(setUser(res?.user));
+      
       navigate("/dashboard");
     } catch (error) {
       toast.error(error.data?.message || "something went wrong ");

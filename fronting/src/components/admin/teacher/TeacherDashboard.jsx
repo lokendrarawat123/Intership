@@ -8,6 +8,7 @@ import {
 import { Loading } from "../../shared/Loading";
 import { Error } from "../../shared/Error";
 import { toast } from "react-toastify";
+import { Pagignation } from "../../shared/Pagignation";
 const intialData = {
   name: "",
   email: "",
@@ -17,7 +18,12 @@ const intialData = {
 };
 
 export const TeacherDashboard = () => {
-  const { data, isLoading, error } = useGetAllTeacherQuery(); // for get teacher api
+  const [page, setPage] = useState(1);
+  //pagination
+  const { data, isLoading, error } = useGetAllTeacherQuery({
+    page,
+    limit: 5,
+  }); // for get teacher api
   const [deleteTeacher] = useDeleteTeacherMutation(); // for delete teacher api
   const [updateTeacher] = useUpdateTeacherMutation();
   const [addTeacher] = useAddTeacherMutation();
@@ -27,6 +33,9 @@ export const TeacherDashboard = () => {
 
   const [isAdding, setIsAdding] = useState(false); // for update teacher api
   const [formData, setFormData] = useState(intialData);
+
+  const totalPages = data?.totalPages;
+
   // console.log(data);
   const teachers = data?.data;
   const handleChange = (e) => {
@@ -222,6 +231,12 @@ export const TeacherDashboard = () => {
             ))}
           </tbody>
         </table>
+
+        <Pagignation
+          page={page}
+          totalPages={totalPages}
+          onPagesChange={setPage}
+        />
 
         {teachers.length === 0 && (
           <p className="p-4 text-center text-gray-500">No teacher data found</p>
